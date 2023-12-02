@@ -6,18 +6,14 @@
 };
 
 var lines = File.ReadAllLines("input.txt");
-int valid = 0;
-int i = 1;
+int powerSum = 0;
 foreach (var line in lines)
 {
     var parsedLine = ParseLine(line);
-    if (parsedLine.red <= inventory[CubeType.Red] && parsedLine.green <= inventory[CubeType.Green] &&
-        parsedLine.blue <= inventory[CubeType.Blue])
-        valid+= i;
-    i++;
+    powerSum += parsedLine.red * parsedLine.green * parsedLine.blue;
 }
 
-Console.WriteLine(valid);
+Console.WriteLine(powerSum);
 
 (int red, int green, int blue) ParseLine(string line)
 {
