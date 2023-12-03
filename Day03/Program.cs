@@ -20,7 +20,7 @@ foreach (var line in lines)
         {
             lastNumber = null;
             if (square != '.')
-                content[i, j] = new Content();
+                content[i, j] = new Content() { Symbol = square };
         }
 
         j++;
@@ -28,31 +28,35 @@ foreach (var line in lines)
     i++;
 }
 
-var valid = new HashSet<Content>();
+int sum = 0;
 for (int row = 0; row < rowCount; row++)
 {
     for (int col = 0; col < colCount; col++)
     {
-        if (content[row, col]?.Number.HasValue != true)
+        if (content[row, col]?.IsGearSymbol != true)
             continue;
-        if (
-            (row > 0 && col > 0 && content[row - 1, col - 1]?.IsSymbol == true) ||
-            (row > 0 && content[row - 1, col]?.IsSymbol == true) ||
-            (row > 0 && col < colCount - 1 && content[row - 1, col + 1]?.IsSymbol == true) ||
-            (col > 0 && content[row, col - 1]?.IsSymbol == true) ||
-            (col < colCount - 1 && content[row, col + 1]?.IsSymbol == true) ||
-            (row < rowCount - 1 && col > 0 && content[row + 1, col - 1]?.IsSymbol == true) ||
-            (row < rowCount - 1 && content[row + 1, col]?.IsSymbol == true) ||
-            (row < rowCount - 1 && col < colCount - 1 && content[row + 1, col + 1]?.IsSymbol == true)
-        )
-            valid.Add(content[row, col]!);
+        HashSet<Content> gears = new HashSet<Content>();
+        if ((row > 0 && col > 0 && content[row - 1, col - 1]?.Number.HasValue == true)) gears.Add(content[row - 1, col - 1]!);
+        if ((row > 0 && content[row - 1, col]?.Number.HasValue == true)) gears.Add(content[row - 1, col]!);
+        if ((row > 0 && col < colCount - 1 && content[row - 1, col + 1]?.Number.HasValue == true)) gears.Add(content[row - 1, col + 1]!);
+        if ((col > 0 && content[row, col - 1]?.Number.HasValue == true)) gears.Add(content[row, col - 1]!);
+        if ((col < colCount - 1 && content[row, col + 1]?.Number.HasValue == true)) gears.Add(content[row, col + 1]!);
+        if ((row < rowCount - 1 && col > 0 && content[row + 1, col - 1]?.Number.HasValue == true)) gears.Add(content[row + 1, col - 1]!);
+        if ((row < rowCount - 1 && content[row + 1, col]?.Number.HasValue == true)) gears.Add(content[row + 1, col]!);
+        if ((row < rowCount - 1 && col < colCount - 1 && content[row + 1, col + 1]?.Number.HasValue == true)) gears.Add(content[row + 1, col + 1]!);
+
+        var gearsList = gears.ToList();
+        if (gears.Count == 2)
+            sum += (gearsList[0].Number!.Value * gearsList[1].Number!.Value);
     }
 }
 
-Console.WriteLine(valid.Sum(s => s.Number!.Value));
+Console.WriteLine(sum);
 
 class Content
 {
     public int? Number { get; set; }
-    public bool IsSymbol => !Number.HasValue;
+    public bool IsSymbol => Symbol.HasValue;
+    public char? Symbol { get; set; }
+    public bool IsGearSymbol => IsSymbol && Symbol!.Value == '*';
 }
